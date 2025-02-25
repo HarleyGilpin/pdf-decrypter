@@ -1,0 +1,91 @@
+name: Build and Publish Windows Binary
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Read version
+        id: version
+        run: echo "version=$(cat version.txt)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Generate version file
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          echo "VSVersionInfo(" > version_file.py
+          echo "  ffi=FixedFileInfo(" >> version_file.py
+          echo "    filevers=(${VERSION//./,}, 0)," >> version_file.py
+          echo "    prodvers=(${VERSION//./,}, 0)," >> version_file.py
+          echo "    mask=0x3f," >> version_file.py
+          echo "    flags=0x0," >> version_file.py
+          echo "    OS=0x40004," >> version_file.py
+          echo "    fileType=0x1," >> version_file.py
+          echo "    subtype=0x0," >> version_file.py
+          echo "    date=(0, 0)" >> version_file.py
+          echo "  )," >> version_file.py
+          echo "  kids=[" >> version_file.py
+          echo "    StringFileInfo(" >> version_file.py
+          echo "      [" >> version_file.py
+          echo "        StringTable(" >> version_file.py
+          echo "          '040904B0'," >> version_file.py
+          echo "          [StringStruct('CompanyName', 'Your Company')," >> version_file.py
+          echo "          StringStruct('FileDescription', 'PDF Decryptor')," >> version_file.py
+          echo "          StringStruct('FileVersion', '${VERSION}')," >> version_file.py
+          echo "          StringStruct('InternalName', 'pdf-decryptor')," >> version_file.py
+          echo "          StringStruct('LegalCopyright', 'Copyright © 2025 Armanino LLP')," >> version_file.py
+          echo "          StringStruct('OriginalFilename', 'pdf-decryptor.exe')," >> version_file.py
+          echo "          StringStruct('ProductName', 'PDF Decryptor')," >> version_file.py
+          echo "          StringStruct('ProductVersion', '${VERSION}')])" >> version_file.py
+          echo "      ]" >> version_file.py
+          echo "    )," >> version_file.py
+          echo "    VarFileInfo([VarStruct('Translation', [0x0409, 1200])])" >> version_file.py
+          echo "  ]" >> version_file.py
+          echo ")" >> version_file.py
+        shell: bash
+
+      - name: Build binary with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed --name pdf-decryptor --version-file version_file.py --add-data "resources/app_icon.png;." --add-data "resources/upload_icon.png;." main.py
+
+      - name: Import GPG key and sign binary
+        shell: bash
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
+          gpg --output dist/pdf-decryptor.exe.sig --detach-sign --local-user ${{ secrets.GPG_KEY_ID }} dist/pdf-decryptor.exe
+
+      - name: Create Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/pdf-decryptor.exe
+            dist/pdf-decryptor.exe.sig
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
