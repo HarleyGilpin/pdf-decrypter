@@ -85,7 +85,7 @@ jobs:
           echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import --verbose
           echo "GPG import finished at $(date)"
           echo "Starting GPG signing at $(date)"
-          gpg --batch --verbose --output dist/pdf-decryptor.exe.sig --detach-sign --local-user ${{ secrets.GPG_KEY_ID }} dist/pdf-decryptor.exe 2>&1 | tee gpg-sign.log
+          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --verbose --output dist/pdf-decryptor.exe.sig --detach-sign --local-user ${{ secrets.GPG_KEY_ID }} dist/pdf-decryptor.exe 2>&1 | tee gpg-sign.log
           echo "GPG signing finished at $(date)"
 
       - name: Create Release
