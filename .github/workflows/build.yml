@@ -19,13 +19,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pyinstaller
+
+      - name: Install UPX
+        run: choco install upx
+        shell: cmd
 
       - name: Read version
         id: version
@@ -55,7 +59,7 @@ jobs:
           echo "          StringStruct('FileDescription', 'PDF Decryptor')," >> version_file.py
           echo "          StringStruct('FileVersion', '${VERSION}')," >> version_file.py
           echo "          StringStruct('InternalName', 'pdf-decryptor')," >> version_file.py
-          echo "          StringStruct('LegalCopyright', 'Copyright © 2025 Armanino LLP')," >> version_file.py
+          echo "          StringStruct('LegalCopyright', '')," >> version_file.py
           echo "          StringStruct('OriginalFilename', 'pdf-decryptor.exe')," >> version_file.py
           echo "          StringStruct('ProductName', 'PDF Decryptor')," >> version_file.py
           echo "          StringStruct('ProductVersion', '${VERSION}')])" >> version_file.py
@@ -68,13 +72,21 @@ jobs:
 
       - name: Build binary with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name pdf-decryptor --version-file version_file.py --add-data "resources/app_icon.png;." --add-data "resources/down_arrow_icon.png;." main.py
+          pyinstaller --onefile --windowed --name pdf-decryptor --version-file version_file.py --add-data "resources/app_icon.png;." --add-data "resources/down_arrow_icon.png;." --upx-dir "C:\ProgramData\chocolatey\bin" main.py
+
+      - name: Check binary size
+        run: dir dist\pdf-decryptor.exe
+        shell: cmd
 
       - name: Import GPG key and sign binary
         shell: bash
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
-          gpg --output dist/pdf-decryptor.exe.sig --detach-sign --local-user ${{ secrets.GPG_KEY_ID }} dist/pdf-decryptor.exe
+          echo "Starting GPG import at $(date)"
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import --verbose
+          echo "GPG import finished at $(date)"
+          echo "Starting GPG signing at $(date)"
+          gpg --batch --verbose --output dist/pdf-decryptor.exe.sig --detach-sign --local-user ${{ secrets.GPG_KEY_ID }} dist/pdf-decryptor.exe
+          echo "GPG signing finished at $(date)"
 
       - name: Create Release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
