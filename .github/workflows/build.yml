@@ -68,7 +68,7 @@ jobs:
 
       - name: Build binary with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name pdf-decryptor --version-file version_file.py --add-data "resources/app_icon.png;." --add-data "resources/upload_icon.png;." main.py
+          pyinstaller --onefile --windowed --name pdf-decryptor --version-file version_file.py --add-data "resources/app_icon.png;." --add-data "resources/down_arrow_icon.png;." main.py
 
       - name: Import GPG key and sign binary
         shell: bash
