@@ -1,2 +1,8 @@
-# pdf-decrypter
-Standalone Windows application for unlocking password protected PDF documents.
+               ______          __                           __           
+    ____  ____/ / __/     ____/ /__  ____________  ______  / /____  _____
+   / __ \/ __  / /_______/ __  / _ \/ ___/ ___/ / / / __ \/ __/ _ \/ ___/
+  / /_/ / /_/ / __/_____/ /_/ /  __/ /__/ /  / /_/ / /_/ / /_/  __/ /    
+ / .___/\__,_/_/        \__,_/\___/\___/_/   \__, / .___/\__/\___/_/     
+/_/                                         /____/_/                     
+
+A standalone Windows application for unlocking password protected PDF documents.
