@@ -100,4 +100,4 @@ jobs:
             dist/pdf-decryptor.exe
             dist/pdf-decryptor.exe.sig
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
