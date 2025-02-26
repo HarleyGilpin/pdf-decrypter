@@ -72,7 +72,7 @@ jobs:
 
       - name: Build binary with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name pdf-decryptor --version-file version_file.py --add-data "resources/app_icon.png;." --add-data "resources/down_arrow_icon.png;." --upx-dir "C:\ProgramData\chocolatey\bin" main.py
+          pyinstaller --onefile --windowed --name pdf-decryptor --version-file version_file.py --add-data "resources/app_icon.png;." --add-data "resources/down_arrow_icon.png;." --add-data "resources/dark_mode.png;." --add-data "resources/light_mode.png;." --upx-dir "C:\ProgramData\chocolatey\bin" main.py
 
       - name: Check binary size
         run: dir dist\pdf-decryptor.exe
