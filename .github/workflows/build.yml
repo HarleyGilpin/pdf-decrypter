@@ -55,13 +55,13 @@ jobs:
           echo "      [" >> version_file.py
           echo "        StringTable(" >> version_file.py
           echo "          '040904B0'," >> version_file.py
-          echo "          [StringStruct('CompanyName', 'Your Company')," >> version_file.py
-          echo "          StringStruct('FileDescription', 'PDF Decryptor')," >> version_file.py
+          echo "          [StringStruct('CompanyName', 'Harley Gilpin')," >> version_file.py
+          echo "          StringStruct('FileDescription', 'PDF Unlocker')," >> version_file.py
           echo "          StringStruct('FileVersion', '${VERSION}')," >> version_file.py
-          echo "          StringStruct('InternalName', 'pdf-decryptor')," >> version_file.py
+          echo "          StringStruct('InternalName', 'pdf-unlocker')," >> version_file.py
           echo "          StringStruct('LegalCopyright', '')," >> version_file.py
-          echo "          StringStruct('OriginalFilename', 'pdf-decryptor.exe')," >> version_file.py
-          echo "          StringStruct('ProductName', 'PDF Decryptor')," >> version_file.py
+          echo "          StringStruct('OriginalFilename', 'pdf-unlocker.exe')," >> version_file.py
+          echo "          StringStruct('ProductName', 'PDF Unlocker')," >> version_file.py
           echo "          StringStruct('ProductVersion', '${VERSION}')])" >> version_file.py
           echo "      ]" >> version_file.py
           echo "    )," >> version_file.py
@@ -72,10 +72,9 @@ jobs:
 
       - name: Build binary with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name pdf-decryptor --version-file version_file.py --add-data "resources/app_icon.png;." --add-data "resources/down_arrow_icon.png;." --add-data "resources/dark_mode.png;." --add-data "resources/light_mode.png;." --upx-dir "C:\ProgramData\chocolatey\bin" main.py
-
+          pyinstaller --onefile --windowed --name pdf-unlocker --version-file version_file.py --add-data "resources/app_icon.png;resources/" --add-data "resources/down_arrow_icon.png;resources/" --add-data "resources/dark_mode.png;resources/" --add-data "resources/light_mode.png;resources/" --upx-dir "C:\ProgramData\chocolatey\bin" main.py
       - name: Check binary size
-        run: dir dist\pdf-decryptor.exe
+        run: dir dist\pdf-unlocker.exe
         shell: cmd
 
       - name: Import GPG key and sign binary
@@ -85,7 +84,7 @@ jobs:
           echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import --verbose
           echo "GPG import finished at $(date)"
           echo "Starting GPG signing at $(date)"
-          gpg --batch --verbose --output dist/pdf-decryptor.exe.sig --detach-sign --local-user ${{ secrets.GPG_KEY_ID }} dist/pdf-decryptor.exe 2>&1 | tee gpg-sign.log
+          gpg --batch --verbose --output dist/pdf-unlocker.exe.sig --detach-sign --local-user ${{ secrets.GPG_KEY_ID }} dist/pdf-unlocker.exe 2>&1 | tee gpg-sign.log
           echo "GPG signing finished at $(date)"
 
       - name: Create Release
@@ -97,7 +96,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            dist/pdf-decryptor.exe
-            dist/pdf-decryptor.exe.sig
+            dist/pdf-unlocker.exe
+            dist/pdf-unlocker.exe.sig
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
