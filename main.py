@@ -76,6 +76,16 @@ LIGHT_THEME = {
 }
 
 
+def resource_path(relative_path: str) -> str:
+    """ Get the absolute path to a resource, compatible with PyInstaller and development mode """
+    base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))  # Use _MEIPASS if frozen
+    return os.path.join(base_path, relative_path)
+
+
+dark_mode_path = resource_path("dark_mode.png")
+light_mode_path = resource_path("light_mode.png")
+
+
 @dataclass
 class PDFFile:
     """Data class to store PDF file information."""
