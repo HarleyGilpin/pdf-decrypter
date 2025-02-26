@@ -370,7 +370,7 @@ class PDFDropZone(QWidget):
         self.text_label.setStyleSheet(f"color: {theme['text-secondary']}; font-size: 16px;")
         layout.addWidget(self.text_label)
 
-        self.load_icon("resources/down_arrow_icon.png", fallback_text="⬇️")
+        self.load_icon(resource_path("resources/down_arrow_icon.png"), fallback_text="⬇️")
         self.setStyleSheet(f"""
             PDFDropZone {{
                 background-color: {theme['surface']};
@@ -551,7 +551,7 @@ class PDFUnlocker(QMainWindow):
         header_layout.addStretch()
 
         self.theme_button = QPushButton()
-        self.theme_button.setIcon(QIcon("resources/dark_mode.png"))
+        self.theme_button.setIcon(QIcon(resource_path("resources/dark_mode.png")))
         self.theme_button.setIconSize(QtCore.QSize(140, 50))  # Set icon size to match button
         self.theme_button.setFixedSize(40, 40)
         self.theme_button.setStyleSheet(f"""
@@ -603,7 +603,7 @@ class PDFUnlocker(QMainWindow):
     def toggle_theme(self):
         self.theme = LIGHT_THEME if self.theme == DARK_THEME else DARK_THEME
         self.setStyleSheet(get_stylesheet(self.theme))
-        icon_path = "resources/dark_mode.png" if self.theme == DARK_THEME else "resources/light_mode.png"
+        icon_path = resource_path("resources/dark_mode.png") if self.theme == DARK_THEME else resource_path("resources/light_mode.png")
         self.theme_button.setIcon(QIcon(icon_path))
         self.theme_button.setIconSize(QtCore.QSize(140, 50))
         if os.path.exists(icon_path):
